@@ -1,0 +1,32 @@
+Action, A001, Fast & Furious 9, Justin Lin, 143, 15.5, 18:30, High, 50
+Action, A002, John Wick 4, Chad Stahelski, 169, 17.0, 21:00, Extreme, 50
+Action, A003, Mad Max: Fury Road, George Miller, 120, 14.5, 19:00, High, 50
+Action, A004, Mission Impossible: Fallout, Christopher McQuarrie, 147, 16.0, 20:30, High, 50
+Action, A005, Black Panther, Ryan Coogler, 134, 15.0, 17:30, Medium, 50
+Action, A006, The Dark Knight, Christopher Nolan, 152, 16.5, 22:00, High, 50
+Action, A007, Avengers: Endgame, Anthony Russo, 181, 18.0, 19:30, Extreme, 50
+Action, A008, Gladiator, Ridley Scott, 155, 14.0, 16:00, Medium, 50
+Comedy, C001, Mr. Bean's Holiday, Steve Bendelack, 90, 12.0, 14:00, -, 50
+Comedy, C002, The Hangover, Todd Phillips, 100, 13.0, 16:30, -, 50
+Comedy, C003, Crazy Rich Asians, Jon M. Chu, 121, 14.0, 18:00, -, 50
+Comedy, C004, 21 Jump Street, Phil Lord, 109, 13.5, 15:00, -, 50
+Comedy, C005, Home Alone, Chris Columbus, 103, 12.5, 11:30, -, 50
+Comedy, C006, Deadpool, Tim Miller, 108, 15.0, 19:00, -, 50
+Comedy, C007, Jumanji: Welcome to the Jungle, Jake Kasdan, 119, 14.0, 17:00, -, 50
+Comedy, C008, Zootopia, Byron Howard, 108, 13.0, 13:00, -, 50
+Romance, R001, Titanic, James Cameron, 195, 18.0, 20:00, R13, 50
+Romance, R002, The Notebook, Nick Cassavetes, 123, 14.0, 18:30, PG, 50
+Romance, R003, La La Land, Damien Chazelle, 128, 15.5, 19:30, PG, 50
+Romance, R004, Me Before You, Thea Sharrock, 110, 14.5, 17:00, PG, 50
+Romance, R005, A Star Is Born, Bradley Cooper, 136, 16.0, 21:00, R16, 50
+Romance, R006, Crazy Stupid Love, Glenn Ficarra, 118, 13.5, 15:00, PG, 50
+Romance, R007, Pride and Prejudice, Joe Wright, 129, 14.0, 13:30, PG, 50
+Romance, R008, Twilight, Catherine Hardwicke, 122, 14.0, 18:00, PG, 50
+ScienceFiction, S001, Avatar, James Cameron, 162, 20.0, 21:00, IMAX, 50
+ScienceFiction, S002, Interstellar, Christopher Nolan, 169, 19.0, 19:00, IMAX, 50
+ScienceFiction, S003, Inception, Christopher Nolan, 148, 18.0, 20:30, IMAX, 50
+ScienceFiction, S004, The Matrix, Lana Wachowski, 136, 17.0, 22:00, 3D, 50
+ScienceFiction, S005, Dune, Denis Villeneuve, 155, 19.5, 21:30, IMAX, 50
+ScienceFiction, S006, Guardians of the Galaxy, James Gunn, 121, 16.0, 17:00, 3D, 50
+ScienceFiction, S007, Star Wars: The Force Awakens, J.J. Abrams, 138, 18.0, 19:30, IMAX, 50
+ScienceFiction, S008, Doctor Strange, Scott Derrickson, 115, 16.0, 16:30, 3D, 50
