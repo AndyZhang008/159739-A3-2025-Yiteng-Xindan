@@ -6,6 +6,9 @@ import org.example.service.MovieManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 public class MovieTableGUI extends JFrame {
@@ -14,6 +17,7 @@ public class MovieTableGUI extends JFrame {
     private DefaultTableModel tableModel;
     private MovieManager movieManager;
     private JButton bookButton;
+    private JButton exportButton;
 
     public MovieTableGUI(MovieManager movieManager) {
         this.movieManager = movieManager;
@@ -51,12 +55,18 @@ public class MovieTableGUI extends JFrame {
         header.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(header, BorderLayout.NORTH);
 
-        // Bottom panel with "Book Ticket" button
+        // Bottom panel with "Book Ticket" and "Export" buttons
         JPanel bottomPanel = new JPanel();
         bookButton = new JButton("Book Ticket");
         bookButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         bookButton.addActionListener(e -> handleBookTicket());
         bottomPanel.add(bookButton);
+        
+        exportButton = new JButton("Export");
+        exportButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        exportButton.addActionListener(e -> handleExport());
+        bottomPanel.add(exportButton);
+        
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
@@ -72,11 +82,7 @@ public class MovieTableGUI extends JFrame {
                     m.getDuration(),
                     m.getPrice(),
                     m.getShowTime(),
-                    m.getExtraInfo()
-                            .replace("Stunt Level: ", "")
-                            .replace("Age Restriction: ", "")
-                            .replace("Format: ", "")
-                            .replace("No extra attributes.", "-"),
+                    m.getExtraInfo(),
                     m.getAvailableTickets()
             };
             tableModel.addRow(rowData);
@@ -122,6 +128,34 @@ public class MovieTableGUI extends JFrame {
                     "No tickets available for this movie!",
                     "Sold Out",
                     JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void handleExport() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Export Movie Data");
+        fileChooser.setSelectedFile(new File("movies.txt"));
+        
+        int userSelection = fileChooser.showSaveDialog(this);
+        
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            
+            try (FileWriter writer = new FileWriter(fileToSave)) {
+                String exportData = movieManager.toExportingFormat();
+                writer.write(exportData);
+                
+                JOptionPane.showMessageDialog(this,
+                        "Movie data exported successfully to:\\n" + fileToSave.getAbsolutePath(),
+                        "Export Successful",
+                        JOptionPane.INFORMATION_MESSAGE);
+                
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Error exporting movie data:\\n" + ex.getMessage(),
+                        "Export Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }
