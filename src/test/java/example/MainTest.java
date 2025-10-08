@@ -2,6 +2,7 @@ package example;
 
 import org.example.model.Movie;
 import org.example.service.MovieManager;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MainTest {
     @Test
+    @DisplayName("Movies should be created correctly!")
     void testMoviesCreation() {
         MovieManager manager = new MovieManager();
         try {
