@@ -19,6 +19,7 @@ public class MovieTableGUI extends JFrame {
     private MovieManager movieManager;
     private JButton bookButton;
     private JButton exportButton;
+    private JButton deleteButton;
     private JComboBox<String> categoryComboBox;
     private JTextField titleSearchField;
 
@@ -108,7 +109,7 @@ public class MovieTableGUI extends JFrame {
         topPanel.add(searchPanel, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
 
-        // Bottom panel with "Book Ticket" and "Export" buttons
+        // Bottom panel with "Book Ticket", "Export", and "Delete" buttons
         JPanel bottomPanel = new JPanel();
         bookButton = new JButton("Book Ticket");
         bookButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
@@ -119,6 +120,11 @@ public class MovieTableGUI extends JFrame {
         exportButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         exportButton.addActionListener(e -> handleExport());
         bottomPanel.add(exportButton);
+
+        deleteButton = new JButton("Delete");
+        deleteButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        deleteButton.addActionListener(e -> handleDelete());
+        bottomPanel.add(deleteButton);
 
         add(bottomPanel, BorderLayout.SOUTH);
     }
@@ -131,26 +137,26 @@ public class MovieTableGUI extends JFrame {
         String selectedCategory = (String) categoryComboBox.getSelectedItem();
         String titleSearchText = titleSearchField.getText().trim();
         tableModel.setRowCount(0); // clear table first
-        
+
         // First, filter by category
         List<Movie> movies;
         if (selectedCategory.equals("All")) {
             movies = movieManager.getAllMovies();
         } else {
             // Map "Science Fiction" to "ScienceFiction" for the search
-            String searchCategory = selectedCategory.equals("Science Fiction") 
-                    ? "ScienceFiction" 
+            String searchCategory = selectedCategory.equals("Science Fiction")
+                    ? "ScienceFiction"
                     : selectedCategory;
             movies = movieManager.getByCategory(searchCategory);
         }
-        
+
         // Then, filter by title if search text is not empty
         if (!titleSearchText.isEmpty()) {
             movies = movies.stream()
                     .filter(m -> m.getTitle().toLowerCase().contains(titleSearchText.toLowerCase()))
                     .collect(Collectors.toList());
         }
-        
+
         // Display filtered results
         for (Movie m : movies) {
             Object[] rowData = {
@@ -171,11 +177,11 @@ public class MovieTableGUI extends JFrame {
     private void handleExport() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Specify a file to save");
-        
+
         int userSelection = fileChooser.showSaveDialog(this);
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
-            
+
             try (FileWriter fileWriter = new FileWriter(fileToSave)) {
                 // Write headers
                 for (int i = 0; i < movieTable.getColumnCount(); i++) {
@@ -191,12 +197,12 @@ public class MovieTableGUI extends JFrame {
                     }
                     fileWriter.write("\n");
                 }
-                
+
                 JOptionPane.showMessageDialog(this,
                         "Data exported successfully to " + fileToSave.getAbsolutePath(),
                         "Export Successful",
                         JOptionPane.INFORMATION_MESSAGE);
-                
+
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this,
                         "Error writing to file: " + ex.getMessage(),
@@ -245,6 +251,61 @@ public class MovieTableGUI extends JFrame {
                     "No tickets available for this movie!",
                     "Sold Out",
                     JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void handleDelete() {
+        int[] selectedRows = movieTable.getSelectedRows();
+
+        // Check if any rows are selected
+        if (selectedRows.length == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Please select one or more rows to delete.",
+                    "No Selection",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Build confirmation message
+        StringBuilder message = new StringBuilder();
+        message.append("Are you sure you want to delete the following movie(s)?\n\n");
+
+        for (int i = 0; i < selectedRows.length; i++) {
+            int modelRow = movieTable.convertRowIndexToModel(selectedRows[i]);
+            String movieID = (String) tableModel.getValueAt(modelRow, 1);
+            String title = (String) tableModel.getValueAt(modelRow, 2);
+            message.append("- ").append(title).append(" (ID: ").append(movieID).append(")\n");
+        }
+
+        // Show confirmation dialog
+        int confirm = JOptionPane.showConfirmDialog(this,
+                message.toString(),
+                "Confirm Deletion",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        // If confirmed, delete the movies
+        if (confirm == JOptionPane.YES_OPTION) {
+            int deletedCount = 0;
+
+            // Delete from manager (iterate backwards to avoid index issues)
+            for (int i = selectedRows.length - 1; i >= 0; i--) {
+                int modelRow = movieTable.convertRowIndexToModel(selectedRows[i]);
+                String movieID = (String) tableModel.getValueAt(modelRow, 1);
+
+                if (movieManager.deleteMovie(movieID)) {
+                    deletedCount++;
+                }
+            }
+
+            // Refresh the table
+            handleSearch();
+
+            // Show success message
+            JOptionPane.showMessageDialog(this,
+                    deletedCount + " movie(s) deleted successfully.",
+                    "Deletion Successful",
+                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }
