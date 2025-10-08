@@ -1,6 +1,7 @@
 package org.example.ui;
 
 import org.example.model.Movie;
+import org.example.model.Staff;
 import org.example.service.MovieManager;
 
 import javax.swing.*;
@@ -15,11 +16,13 @@ public class MovieTableGUI extends JFrame {
 
     private JTable movieTable;
     private DefaultTableModel tableModel;
+    private Staff staff;
     private MovieManager movieManager;
     private JButton bookButton;
     private JButton exportButton;
 
-    public MovieTableGUI(MovieManager movieManager) {
+    public MovieTableGUI(Staff staff, MovieManager movieManager) {
+        this.staff = staff;
         this.movieManager = movieManager;
         setTitle("Cinema Ticket Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

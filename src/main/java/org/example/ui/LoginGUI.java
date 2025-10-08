@@ -2,6 +2,7 @@ package org.example.ui;
 
 import org.example.model.Manager;
 import org.example.model.Staff;
+import org.example.service.MovieManager;
 import org.example.service.StaffManager;
 
 import javax.swing.*;
@@ -14,14 +15,16 @@ import java.awt.event.ActionListener;
  */
 public class LoginGUI extends JFrame {
     private StaffManager staffManager;
+    private MovieManager movieManager;
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
     private JButton clearButton;
     private JLabel statusLabel;
 
-    public LoginGUI(StaffManager staffManager) {
+    public LoginGUI(StaffManager staffManager, MovieManager movieManager) {
         this.staffManager = staffManager;
+        this.movieManager = movieManager;
         initializeUI();
     }
 
@@ -226,28 +229,8 @@ public class LoginGUI extends JFrame {
         // Close login window
         this.dispose();
 
-        // Open appropriate interface based on role
-        if (staff instanceof Manager) {
-            // Open Manager interface
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Manager interface will open here.\n" +
-                            "Logged in as: " + staff.getName(),
-                    "Manager Dashboard",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-            // TODO: Open ManagerGUI(staff, movieManager)
-        } else {
-            // Open TicketSeller interface
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Ticket Seller interface will open here.\n" +
-                            "Logged in as: " + staff.getName(),
-                    "Ticket Seller Dashboard",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-            // TODO: Open TicketSellerGUI(staff, movieManager)
-        }
+        MovieTableGUI gui = new MovieTableGUI(staff, movieManager);
+        gui.setVisible(true);
     }
 
     private class LoginActionListener implements ActionListener {

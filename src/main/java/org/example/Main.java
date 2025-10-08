@@ -10,6 +10,7 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
         StaffManager staffManager = new StaffManager();
+        MovieManager movieManager = new MovieManager();
 
         try {
             // Load staff data
@@ -23,9 +24,20 @@ public class Main {
                     JOptionPane.ERROR_MESSAGE
             );
         }
+        try {
+            // Load movie data
+            movieManager.loadMovies("./movies.txt");
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Error loading movies.txt: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
         SwingUtilities.invokeLater(() -> {
             // Create and show login GUI
-            LoginGUI loginGUI = new LoginGUI(staffManager);
+            LoginGUI loginGUI = new LoginGUI(staffManager, movieManager);
             loginGUI.setVisible(true);
         });
     }
