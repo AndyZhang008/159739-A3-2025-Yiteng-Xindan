@@ -18,6 +18,7 @@ public class MovieTableGUI extends JFrame {
     private MovieManager movieManager;
     private JButton bookButton;
     private JButton exportButton;
+    private JComboBox<String> categoryComboBox;
 
     public MovieTableGUI(MovieManager movieManager) {
         this.movieManager = movieManager;
@@ -50,10 +51,30 @@ public class MovieTableGUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(movieTable);
         add(scrollPane, BorderLayout.CENTER);
 
+        // Top panel with header and search
+        JPanel topPanel = new JPanel(new BorderLayout());
+
         JLabel header = new JLabel("🎬 Movie List", SwingConstants.CENTER);
         header.setFont(new Font("SansSerif", Font.BOLD, 22));
         header.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(header, BorderLayout.NORTH);
+        topPanel.add(header, BorderLayout.CENTER);
+
+        // Search panel
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        JLabel searchLabel = new JLabel("Filter by Category:");
+        searchLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        searchPanel.add(searchLabel);
+
+        String[] categories = {"All", "Action", "Comedy", "Romance", "Science Fiction"};
+        categoryComboBox = new JComboBox<>(categories);
+        categoryComboBox.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        categoryComboBox.addActionListener(e -> handleSearch());
+        searchPanel.add(categoryComboBox);
+
+        topPanel.add(searchPanel, BorderLayout.SOUTH);
+        add(topPanel, BorderLayout.NORTH);
 
         // Bottom panel with "Book Ticket" and "Export" buttons
         JPanel bottomPanel = new JPanel();
@@ -61,18 +82,49 @@ public class MovieTableGUI extends JFrame {
         bookButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         bookButton.addActionListener(e -> handleBookTicket());
         bottomPanel.add(bookButton);
-        
+
         exportButton = new JButton("Export");
         exportButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         exportButton.addActionListener(e -> handleExport());
         bottomPanel.add(exportButton);
-        
+
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
     private void loadMoviesIntoTable() {
         tableModel.setRowCount(0); // clear table first
         List<Movie> movies = movieManager.getAllMovies();
+        for (Movie m : movies) {
+            Object[] rowData = {
+                    m.getCategory(),
+                    m.getMovieID(),
+                    m.getTitle(),
+                    m.getDirector(),
+                    m.getDuration(),
+                    m.getPrice(),
+                    m.getShowTime(),
+                    m.getExtraInfo(),
+                    m.getAvailableTickets()
+            };
+            tableModel.addRow(rowData);
+        }
+    }
+
+    private void handleSearch() {
+        String selectedCategory = (String) categoryComboBox.getSelectedItem();
+        tableModel.setRowCount(0); // clear table first
+
+        List<Movie> movies;
+        if (selectedCategory.equals("All")) {
+            movies = movieManager.getAllMovies();
+        } else {
+            // Map "Science Fiction" to "ScienceFiction" for the search
+            String searchCategory = selectedCategory.equals("Science Fiction")
+                    ? "ScienceFiction"
+                    : selectedCategory;
+            movies = movieManager.getByCategory(searchCategory);
+        }
+
         for (Movie m : movies) {
             Object[] rowData = {
                     m.getCategory(),
@@ -135,24 +187,24 @@ public class MovieTableGUI extends JFrame {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Export Movie Data");
         fileChooser.setSelectedFile(new File("movies.txt"));
-        
+
         int userSelection = fileChooser.showSaveDialog(this);
-        
+
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
-            
+
             try (FileWriter writer = new FileWriter(fileToSave)) {
                 String exportData = movieManager.toExportingFormat();
                 writer.write(exportData);
-                
+
                 JOptionPane.showMessageDialog(this,
-                        "Movie data exported successfully to:\\n" + fileToSave.getAbsolutePath(),
+                        "Movie data exported successfully to:\n" + fileToSave.getAbsolutePath(),
                         "Export Successful",
                         JOptionPane.INFORMATION_MESSAGE);
-                
+
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this,
-                        "Error exporting movie data:\\n" + ex.getMessage(),
+                        "Error exporting movie data:\n" + ex.getMessage(),
                         "Export Error",
                         JOptionPane.ERROR_MESSAGE);
             }
