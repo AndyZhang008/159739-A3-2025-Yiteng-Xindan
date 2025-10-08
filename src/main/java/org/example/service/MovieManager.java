@@ -69,6 +69,48 @@ public class MovieManager {
         return list;
     }
 
+    /**
+     * Search for movies by title (case-insensitive partial match)
+     */
+    public List<Movie> searchByTitle(String title) {
+        List<Movie> result = new ArrayList<>();
+        for (Movie m : movies) {
+            if (m.getTitle().toLowerCase().contains(title.toLowerCase())) {
+                result.add(m);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Add a new movie to the collection
+     */
+    public void addMovie(Movie movie) {
+        if (movie != null) {
+            movies.add(movie);
+        }
+    }
+
+    /**
+     * Update an existing movie
+     */
+    public boolean updateMovie(String movieId, Movie updatedMovie) {
+        for (int i = 0; i < movies.size(); i++) {
+            if (movies.get(i).getMovieID().equalsIgnoreCase(movieId)) {
+                movies.set(i, updatedMovie);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Delete a movie by ID
+     */
+    public boolean deleteMovie(String movieId) {
+        return movies.removeIf(m -> m.getMovieID().equalsIgnoreCase(movieId));
+    }
+
     public String toExportingFormat() {
         String recordText = "";
         for (Movie m : movies) {
