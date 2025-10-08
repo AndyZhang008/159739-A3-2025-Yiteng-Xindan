@@ -20,17 +20,40 @@ public class MovieDetailGUI extends JDialog {
     private JComboBox<String> extraAttributeComboBox;
     private JSpinner availableTicketsSpinner;
 
+    private JButton actionButton;
+    private JButton resetButton;
+    private JButton cancelButton;
+
+    // Store initial values for reset functionality
+    private String initialMovieId;
+    private String initialTitle;
+    private String initialCategory;
+    private String initialDirector;
+    private int initialDuration;
+    private double initialPrice;
+    private String initialShowTime;
+    private String initialExtraAttribute;
+    private int initialAvailableTickets;
+
+    private boolean confirmed = false;
+
     public MovieDetailGUI(Movie movie) {
         this.movie = movie;
 
         setTitle("Movie Details");
         setModal(true);
-        setSize(500, 450);
+        setSize(500, 520);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         initComponents();
         populateFields();
+        storeInitialValues();
+
+        // Disable Movie ID field if updating existing movie
+        if (movie != null) {
+            movieIdField.setEnabled(false);
+        }
     }
 
     private void initComponents() {
@@ -170,6 +193,30 @@ public class MovieDetailGUI extends JDialog {
         mainPanel.add(availableTicketsSpinner, gbc);
 
         add(mainPanel, BorderLayout.CENTER);
+
+        // Button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+
+        // Dynamic button (Add Movie or Update Movie)
+        String actionButtonText = (movie == null) ? "Add Movie" : "Update Movie";
+        actionButton = new JButton(actionButtonText);
+        actionButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        actionButton.addActionListener(e -> handleAction());
+        buttonPanel.add(actionButton);
+
+        // Reset button
+        resetButton = new JButton("Reset");
+        resetButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        resetButton.addActionListener(e -> handleReset());
+        buttonPanel.add(resetButton);
+
+        // Cancel button
+        cancelButton = new JButton("Cancel");
+        cancelButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        cancelButton.addActionListener(e -> handleCancel());
+        buttonPanel.add(cancelButton);
+
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     private void populateFields() {
@@ -198,7 +245,26 @@ public class MovieDetailGUI extends JDialog {
                     extraAttributeComboBox.setSelectedItem(extraInfo);
                 }
             });
+        } else {
+            // Set default values for new movie
+            movieIdField.setText("");
+            titleField.setText("");
+            directorField.setText("");
+            showTimeField.setText("");
+            updateExtraAttributeOptions();
         }
+    }
+
+    private void storeInitialValues() {
+        initialMovieId = movieIdField.getText();
+        initialTitle = titleField.getText();
+        initialCategory = (String) categoryComboBox.getSelectedItem();
+        initialDirector = directorField.getText();
+        initialDuration = (Integer) durationSpinner.getValue();
+        initialPrice = (Double) priceSpinner.getValue();
+        initialShowTime = showTimeField.getText();
+        initialExtraAttribute = (String) extraAttributeComboBox.getSelectedItem();
+        initialAvailableTickets = (Integer) availableTicketsSpinner.getValue();
     }
 
     private void updateExtraAttributeOptions() {
@@ -235,6 +301,36 @@ public class MovieDetailGUI extends JDialog {
         }
     }
 
+    private void handleAction() {
+        if (validateFields()) {
+            confirmed = true;
+            dispose();
+        }
+    }
+
+    private void handleReset() {
+        movieIdField.setText(initialMovieId);
+        titleField.setText(initialTitle);
+        categoryComboBox.setSelectedItem(initialCategory);
+        directorField.setText(initialDirector);
+        durationSpinner.setValue(initialDuration);
+        priceSpinner.setValue(initialPrice);
+        showTimeField.setText(initialShowTime);
+        availableTicketsSpinner.setValue(initialAvailableTickets);
+
+        // Reset extra attribute after category is set
+        SwingUtilities.invokeLater(() -> {
+            if (initialExtraAttribute != null) {
+                extraAttributeComboBox.setSelectedItem(initialExtraAttribute);
+            }
+        });
+    }
+
+    private void handleCancel() {
+        confirmed = false;
+        dispose();
+    }
+
     public boolean validateFields() {
         if (movieIdField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -261,6 +357,10 @@ public class MovieDetailGUI extends JDialog {
         }
 
         return true;
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
     }
 
     // Getters for the field values

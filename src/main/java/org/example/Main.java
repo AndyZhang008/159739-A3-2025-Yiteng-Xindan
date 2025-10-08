@@ -24,7 +24,9 @@ public class Main {
             }
             Movie movie = manager.findById("A006");
             MovieDetailGUI movieDetailGUI = new MovieDetailGUI(movie);
+            MovieDetailGUI movieDetailGUI2 = new MovieDetailGUI(null);
             movieDetailGUI.setVisible(true);
+            movieDetailGUI2.setVisible(true);
         });
     }
 }
