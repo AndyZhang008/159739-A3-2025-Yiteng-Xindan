@@ -2,9 +2,9 @@ name: Maven CI Workflow
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, "ui/**" ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, "ui/**" ]
 
 jobs:
   build:

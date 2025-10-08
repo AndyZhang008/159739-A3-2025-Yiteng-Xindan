@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MovieTableGUI extends JFrame {
 
@@ -19,6 +20,7 @@ public class MovieTableGUI extends JFrame {
     private JButton bookButton;
     private JButton exportButton;
     private JComboBox<String> categoryComboBox;
+    private JTextField titleSearchField;
 
     public MovieTableGUI(MovieManager movieManager) {
         this.movieManager = movieManager;
@@ -59,19 +61,49 @@ public class MovieTableGUI extends JFrame {
         header.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         topPanel.add(header, BorderLayout.CENTER);
 
-        // Search panel
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        // Search panel with GridBagLayout for even spacing
+        JPanel searchPanel = new JPanel(new GridBagLayout());
         searchPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel searchLabel = new JLabel("Filter by Category:");
-        searchLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        searchPanel.add(searchLabel);
+        // Category filter section
+        JPanel categoryPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        JLabel categoryLabel = new JLabel("Filter by Category:");
+        categoryLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        categoryPanel.add(categoryLabel);
 
         String[] categories = {"All", "Action", "Comedy", "Romance", "Science Fiction"};
         categoryComboBox = new JComboBox<>(categories);
         categoryComboBox.setFont(new Font("SansSerif", Font.PLAIN, 14));
         categoryComboBox.addActionListener(e -> handleSearch());
-        searchPanel.add(categoryComboBox);
+        categoryPanel.add(categoryComboBox);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.5;
+        searchPanel.add(categoryPanel, gbc);
+
+        // Title search section
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        JLabel titleLabel = new JLabel("Search by Title:");
+        titleLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        titlePanel.add(titleLabel);
+
+        titleSearchField = new JTextField(15);
+        titleSearchField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        titleSearchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { handleSearch(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { handleSearch(); }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { handleSearch(); }
+        });
+        titlePanel.add(titleSearchField);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0.5;
+        searchPanel.add(titlePanel, gbc);
 
         topPanel.add(searchPanel, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
@@ -92,8 +124,34 @@ public class MovieTableGUI extends JFrame {
     }
 
     private void loadMoviesIntoTable() {
+        handleSearch();
+    }
+
+    private void handleSearch() {
+        String selectedCategory = (String) categoryComboBox.getSelectedItem();
+        String titleSearchText = titleSearchField.getText().trim();
         tableModel.setRowCount(0); // clear table first
-        List<Movie> movies = movieManager.getAllMovies();
+        
+        // First, filter by category
+        List<Movie> movies;
+        if (selectedCategory.equals("All")) {
+            movies = movieManager.getAllMovies();
+        } else {
+            // Map "Science Fiction" to "ScienceFiction" for the search
+            String searchCategory = selectedCategory.equals("Science Fiction") 
+                    ? "ScienceFiction" 
+                    : selectedCategory;
+            movies = movieManager.getByCategory(searchCategory);
+        }
+        
+        // Then, filter by title if search text is not empty
+        if (!titleSearchText.isEmpty()) {
+            movies = movies.stream()
+                    .filter(m -> m.getTitle().toLowerCase().contains(titleSearchText.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        
+        // Display filtered results
         for (Movie m : movies) {
             Object[] rowData = {
                     m.getCategory(),
@@ -110,34 +168,41 @@ public class MovieTableGUI extends JFrame {
         }
     }
 
-    private void handleSearch() {
-        String selectedCategory = (String) categoryComboBox.getSelectedItem();
-        tableModel.setRowCount(0); // clear table first
+    private void handleExport() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Specify a file to save");
+        
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            
+            try (FileWriter fileWriter = new FileWriter(fileToSave)) {
+                // Write headers
+                for (int i = 0; i < movieTable.getColumnCount(); i++) {
+                    fileWriter.write(movieTable.getColumnName(i) + ",");
+                }
+                fileWriter.write("\n");
 
-        List<Movie> movies;
-        if (selectedCategory.equals("All")) {
-            movies = movieManager.getAllMovies();
-        } else {
-            // Map "Science Fiction" to "ScienceFiction" for the search
-            String searchCategory = selectedCategory.equals("Science Fiction")
-                    ? "ScienceFiction"
-                    : selectedCategory;
-            movies = movieManager.getByCategory(searchCategory);
-        }
-
-        for (Movie m : movies) {
-            Object[] rowData = {
-                    m.getCategory(),
-                    m.getMovieID(),
-                    m.getTitle(),
-                    m.getDirector(),
-                    m.getDuration(),
-                    m.getPrice(),
-                    m.getShowTime(),
-                    m.getExtraInfo(),
-                    m.getAvailableTickets()
-            };
-            tableModel.addRow(rowData);
+                // Write data
+                for (int i = 0; i < movieTable.getRowCount(); i++) {
+                    for (int j = 0; j < movieTable.getColumnCount(); j++) {
+                        Object value = movieTable.getValueAt(i, j);
+                        fileWriter.write(value != null ? value.toString() : "" + ",");
+                    }
+                    fileWriter.write("\n");
+                }
+                
+                JOptionPane.showMessageDialog(this,
+                        "Data exported successfully to " + fileToSave.getAbsolutePath(),
+                        "Export Successful",
+                        JOptionPane.INFORMATION_MESSAGE);
+                
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Error writing to file: " + ex.getMessage(),
+                        "Export Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -180,34 +245,6 @@ public class MovieTableGUI extends JFrame {
                     "No tickets available for this movie!",
                     "Sold Out",
                     JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    private void handleExport() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Export Movie Data");
-        fileChooser.setSelectedFile(new File("movies.txt"));
-
-        int userSelection = fileChooser.showSaveDialog(this);
-
-        if (userSelection == JFileChooser.APPROVE_OPTION) {
-            File fileToSave = fileChooser.getSelectedFile();
-
-            try (FileWriter writer = new FileWriter(fileToSave)) {
-                String exportData = movieManager.toExportingFormat();
-                writer.write(exportData);
-
-                JOptionPane.showMessageDialog(this,
-                        "Movie data exported successfully to:\n" + fileToSave.getAbsolutePath(),
-                        "Export Successful",
-                        JOptionPane.INFORMATION_MESSAGE);
-
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this,
-                        "Error exporting movie data:\n" + ex.getMessage(),
-                        "Export Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
         }
     }
 }
