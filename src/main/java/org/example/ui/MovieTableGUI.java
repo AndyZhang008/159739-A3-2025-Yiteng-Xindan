@@ -22,6 +22,7 @@ public class MovieTableGUI extends JFrame {
     private JButton exportButton;
     private JButton deleteButton;
     private JButton addMovieButton;
+    private JButton updateMovieButton;
     private JComboBox<String> categoryComboBox;
     private JTextField titleSearchField;
 
@@ -118,6 +119,11 @@ public class MovieTableGUI extends JFrame {
         addMovieButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         addMovieButton.addActionListener(e -> handleAddMovie());
         bottomPanel.add(addMovieButton);
+
+        updateMovieButton = new JButton("Update Movie");
+        updateMovieButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        updateMovieButton.addActionListener(e -> handleUpdateMovie());
+        bottomPanel.add(updateMovieButton);
 
         bookButton = new JButton("Book Ticket");
         bookButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
@@ -237,6 +243,94 @@ public class MovieTableGUI extends JFrame {
                     "Movie '" + title + "' added successfully!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    private void handleUpdateMovie() {
+        int selectedRow = movieTable.getSelectedRow();
+
+        // Check if a row is selected
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Please select a movie to update.",
+                    "No Selection",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Convert view index to model index
+        int modelRow = movieTable.convertRowIndexToModel(selectedRow);
+        String movieID = (String) tableModel.getValueAt(modelRow, 1);
+
+        // Find the movie
+        Movie movie = movieManager.findById(movieID);
+        if (movie == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Selected movie not found!",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Open MovieDetailGUI with the selected movie
+        MovieDetailGUI detailGUI = new MovieDetailGUI(movie, movieManager);
+        detailGUI.setVisible(true);
+
+        // Check if user confirmed the update
+        if (detailGUI.isConfirmed()) {
+            // Create updated movie object based on category
+            String category = detailGUI.getSelectedCategory();
+            String movieId = detailGUI.getMovieId();
+            String title = detailGUI.getMovieTitle();
+            String director = detailGUI.getMovieDirector();
+            int duration = detailGUI.getDuration();
+            double price = detailGUI.getPrice();
+            String showTime = detailGUI.getShowTime();
+            String extraAttribute = detailGUI.getExtraAttribute();
+            int availableTickets = detailGUI.getAvailableTickets();
+
+            Movie updatedMovie;
+            switch (category) {
+                case "Action":
+                    updatedMovie = new ActionMovie(category, movieId, title, director,
+                            duration, price, showTime, extraAttribute, availableTickets);
+                    break;
+                case "Comedy":
+                    updatedMovie = new ComedyMovie(category, movieId, title, director,
+                            duration, price, showTime, availableTickets);
+                    break;
+                case "Romance":
+                    updatedMovie = new RomanceMovie(category, movieId, title, director,
+                            duration, price, showTime, extraAttribute, availableTickets);
+                    break;
+                case "ScienceFiction":
+                    updatedMovie = new ScienceFictionMovie(category, movieId, title, director,
+                            duration, price, showTime, extraAttribute, availableTickets);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(this,
+                            "Invalid category selected!",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+            }
+
+            // Update movie in manager
+            if (movieManager.updateMovie(movieId, updatedMovie)) {
+                // Refresh the table
+                handleSearch();
+
+                // Show success message
+                JOptionPane.showMessageDialog(this,
+                        "Movie '" + title + "' updated successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Failed to update movie!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
