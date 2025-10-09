@@ -3,6 +3,7 @@ package org.example.ui;
 
 import org.example.model.*;
 import org.example.service.MovieManager;
+import org.example.service.StaffManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -19,6 +20,7 @@ public class MovieTableGUI extends JFrame {
     private DefaultTableModel tableModel;
     private Staff staff;
     private MovieManager movieManager;
+    private StaffManager staffManager;
     private JButton bookButton;
     private JButton exportButton;
     private JButton deleteButton;
@@ -27,16 +29,59 @@ public class MovieTableGUI extends JFrame {
     private JComboBox<String> categoryComboBox;
     private JTextField titleSearchField;
 
-    public MovieTableGUI(Staff staff, MovieManager movieManager) {
+    public MovieTableGUI(Staff staff, MovieManager movieManager, StaffManager staffManager) {
         this.staff = staff;
         this.movieManager = movieManager;
-        setTitle("Cinema Ticket Management System");
+        this.staffManager = staffManager;
+        setTitle("Cinema Ticket Management System - " + staff.getName() + " (" + staff.getRole() + ")");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 600);
         setLocationRelativeTo(null);
 
+        // Create menu bar
+        createMenuBar();
+
         initComponents();
         loadMoviesIntoTable();
+    }
+
+    private void createMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+
+        // Account Menu
+        JMenu accountMenu = new JMenu("Account");
+        accountMenu.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+        JMenuItem logoutMenuItem = new JMenuItem("Logout");
+        logoutMenuItem.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        logoutMenuItem.addActionListener(e -> handleLogout());
+        accountMenu.add(logoutMenuItem);
+
+        menuBar.add(accountMenu);
+
+        setJMenuBar(menuBar);
+    }
+
+    private void handleLogout() {
+        // Show confirmation dialog
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to logout?",
+                "Confirm Logout",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Close current window
+            this.dispose();
+
+            // Open login GUI
+            SwingUtilities.invokeLater(() -> {
+                LoginGUI loginGUI = new LoginGUI(staffManager, movieManager);
+                loginGUI.setVisible(true);
+            });
+        }
     }
 
     private void initComponents() {

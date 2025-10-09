@@ -229,7 +229,7 @@ public class LoginGUI extends JFrame {
         // Close login window
         this.dispose();
 
-        MovieTableGUI gui = new MovieTableGUI(staff, movieManager);
+        MovieTableGUI gui = new MovieTableGUI(staff, movieManager, staffManager);
         gui.setVisible(true);
     }
 
