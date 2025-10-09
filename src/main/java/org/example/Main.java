@@ -1,9 +1,11 @@
 package org.example;
 
+import org.example.model.Movie;
 import org.example.service.MovieManager;
 import org.example.service.StaffManager;
 import org.example.ui.LoginGUI;
 import org.example.ui.MovieTableGUI;
+import org.example.ui.MovieDetailGUI;
 
 import javax.swing.*;
 
