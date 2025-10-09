@@ -345,20 +345,8 @@ public class MovieTableGUI extends JFrame {
             File fileToSave = fileChooser.getSelectedFile();
 
             try (FileWriter fileWriter = new FileWriter(fileToSave)) {
-                // Write headers
-                for (int i = 0; i < movieTable.getColumnCount(); i++) {
-                    fileWriter.write(movieTable.getColumnName(i) + ",");
-                }
-                fileWriter.write("\n");
-
                 // Write data
-                for (int i = 0; i < movieTable.getRowCount(); i++) {
-                    for (int j = 0; j < movieTable.getColumnCount(); j++) {
-                        Object value = movieTable.getValueAt(i, j);
-                        fileWriter.write(value != null ? value.toString() : "" + ",");
-                    }
-                    fileWriter.write("\n");
-                }
+                fileWriter.write(movieManager.toExportingFormat());
 
                 JOptionPane.showMessageDialog(this,
                         "Data exported successfully to " + fileToSave.getAbsolutePath(),
