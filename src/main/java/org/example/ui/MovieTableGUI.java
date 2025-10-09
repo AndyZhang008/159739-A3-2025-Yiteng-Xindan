@@ -215,6 +215,12 @@ public class MovieTableGUI extends JFrame {
         gbc.gridx = 3;
         bottomPanel.add(deleteButton, gbc);
 
+        if (!(staff instanceof Manager)) {
+            addMovieButton.setEnabled(false);
+            updateMovieButton.setText("View Details");
+            deleteButton.setEnabled(false);
+        }
+
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
@@ -326,10 +332,17 @@ public class MovieTableGUI extends JFrame {
 
         // Check if a row is selected
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this,
-                    "Please select a movie to update.",
-                    "No Selection",
-                    JOptionPane.WARNING_MESSAGE);
+            if (staff instanceof Manager) {
+                JOptionPane.showMessageDialog(this,
+                        "Please select a movie to update.",
+                        "No Selection",
+                        JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Please select a movie to view.",
+                        "No Selection",
+                        JOptionPane.WARNING_MESSAGE);
+            }
             return;
         }
 
@@ -348,7 +361,13 @@ public class MovieTableGUI extends JFrame {
         }
 
         // Open MovieDetailGUI with the selected movie
-        MovieDetailGUI detailGUI = new MovieDetailGUI(movie, movieManager);
+        MovieDetailGUI detailGUI;
+
+        if (!(staff instanceof Manager))
+            detailGUI = new MovieDetailGUI(movie, movieManager, true);
+        else
+            detailGUI = new MovieDetailGUI(movie, movieManager);
+
         detailGUI.setVisible(true);
 
         // Check if user confirmed the update

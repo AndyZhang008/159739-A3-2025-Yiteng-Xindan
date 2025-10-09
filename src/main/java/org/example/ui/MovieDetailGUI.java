@@ -38,10 +38,15 @@ public class MovieDetailGUI extends JDialog {
     private int initialAvailableTickets;
 
     private boolean confirmed = false;
+    private boolean readOnly;
 
     public MovieDetailGUI(Movie movie, MovieManager movieManager) {
+        this(movie, movieManager, false);
+    }
+    public MovieDetailGUI(Movie movie, MovieManager movieManager, boolean readOnly) {
         this.movie = movie;
         this.movieManager = movieManager;
+        this.readOnly = readOnly;
 
         setTitle("Movie Details");
         setModal(true);
@@ -219,6 +224,11 @@ public class MovieDetailGUI extends JDialog {
         cancelButton.addActionListener(e -> handleCancel());
         buttonPanel.add(cancelButton);
 
+        if (readOnly) {
+            actionButton.setEnabled(false);
+            cancelButton.setText("Close");
+        }
+
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
@@ -276,7 +286,7 @@ public class MovieDetailGUI extends JDialog {
 
         switch (selectedCategory) {
             case "Action":
-                extraAttributeComboBox.setEnabled(true);
+                if (!readOnly) extraAttributeComboBox.setEnabled(true);
                 extraAttributeComboBox.addItem("Low");
                 extraAttributeComboBox.addItem("Medium");
                 extraAttributeComboBox.addItem("High");
@@ -289,7 +299,7 @@ public class MovieDetailGUI extends JDialog {
                 break;
 
             case "Romance":
-                extraAttributeComboBox.setEnabled(true);
+                if (!readOnly) extraAttributeComboBox.setEnabled(true);
                 extraAttributeComboBox.addItem("G");
                 extraAttributeComboBox.addItem("PG");
                 extraAttributeComboBox.addItem("R13");
@@ -297,7 +307,7 @@ public class MovieDetailGUI extends JDialog {
                 break;
 
             case "Science Fiction":
-                extraAttributeComboBox.setEnabled(true);
+                if (!readOnly) extraAttributeComboBox.setEnabled(true);
                 extraAttributeComboBox.addItem("IMAX");
                 extraAttributeComboBox.addItem("3D");
                 break;
