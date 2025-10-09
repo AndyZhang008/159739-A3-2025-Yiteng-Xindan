@@ -187,28 +187,33 @@ public class MovieTableGUI extends JFrame {
         topPanel.add(searchPanel, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
 
-        // Bottom panel with buttons
-        JPanel bottomPanel = new JPanel();
+        // Bottom panel with buttons and GridBagLayout for even spacing
+        JPanel bottomPanel = new JPanel(new GridBagLayout());
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         addMovieButton = new JButton("Add Movie");
         addMovieButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         addMovieButton.addActionListener(e -> handleAddMovie());
-        bottomPanel.add(addMovieButton);
+        gbc.gridx = 0;
+        bottomPanel.add(addMovieButton, gbc);
 
         updateMovieButton = new JButton("Update Movie");
         updateMovieButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         updateMovieButton.addActionListener(e -> handleUpdateMovie());
-        bottomPanel.add(updateMovieButton);
+        gbc.gridx = 1;
+        bottomPanel.add(updateMovieButton, gbc);
 
         bookButton = new JButton("Book Ticket");
         bookButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         bookButton.addActionListener(e -> handleBookTicket());
-        bottomPanel.add(bookButton);
+        gbc.gridx = 2;
+        bottomPanel.add(bookButton, gbc);
 
-        deleteButton = new JButton("Delete");
+        deleteButton = new JButton("Delete Movie");
         deleteButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         deleteButton.addActionListener(e -> handleDelete());
-        bottomPanel.add(deleteButton);
+        gbc.gridx = 3;
+        bottomPanel.add(deleteButton, gbc);
 
         add(bottomPanel, BorderLayout.SOUTH);
     }
