@@ -22,7 +22,6 @@ public class MovieTableGUI extends JFrame {
     private MovieManager movieManager;
     private StaffManager staffManager;
     private JButton bookButton;
-    private JButton exportButton;
     private JButton deleteButton;
     private JButton addMovieButton;
     private JButton updateMovieButton;
@@ -47,6 +46,35 @@ public class MovieTableGUI extends JFrame {
 
     private void createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
+
+        // File Menu
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+        JMenuItem exportMenuItem = new JMenuItem("Export Data");
+        exportMenuItem.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        exportMenuItem.addActionListener(e -> handleExport());
+        fileMenu.add(exportMenuItem);
+
+        fileMenu.addSeparator();
+
+        JMenuItem exitMenuItem = new JMenuItem("Exit");
+        exitMenuItem.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        exitMenuItem.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to exit the application?",
+                    "Confirm Exit",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+            if (confirm == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        });
+        fileMenu.add(exitMenuItem);
+
+        menuBar.add(fileMenu);
 
         // Account Menu
         JMenu accountMenu = new JMenu("Account");
@@ -176,11 +204,6 @@ public class MovieTableGUI extends JFrame {
         bookButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         bookButton.addActionListener(e -> handleBookTicket());
         bottomPanel.add(bookButton);
-
-        exportButton = new JButton("Export");
-        exportButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        exportButton.addActionListener(e -> handleExport());
-        bottomPanel.add(exportButton);
 
         deleteButton = new JButton("Delete");
         deleteButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
