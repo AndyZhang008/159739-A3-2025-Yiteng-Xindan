@@ -1,6 +1,7 @@
+
 package org.example.ui;
 
-import org.example.model.Movie;
+import org.example.model.*;
 import org.example.service.MovieManager;
 
 import javax.swing.*;
@@ -20,6 +21,7 @@ public class MovieTableGUI extends JFrame {
     private JButton bookButton;
     private JButton exportButton;
     private JButton deleteButton;
+    private JButton addMovieButton;
     private JComboBox<String> categoryComboBox;
     private JTextField titleSearchField;
 
@@ -109,8 +111,14 @@ public class MovieTableGUI extends JFrame {
         topPanel.add(searchPanel, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
 
-        // Bottom panel with "Book Ticket", "Export", and "Delete" buttons
+        // Bottom panel with buttons
         JPanel bottomPanel = new JPanel();
+
+        addMovieButton = new JButton("Add Movie");
+        addMovieButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        addMovieButton.addActionListener(e -> handleAddMovie());
+        bottomPanel.add(addMovieButton);
+
         bookButton = new JButton("Book Ticket");
         bookButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         bookButton.addActionListener(e -> handleBookTicket());
@@ -171,6 +179,64 @@ public class MovieTableGUI extends JFrame {
                     m.getAvailableTickets()
             };
             tableModel.addRow(rowData);
+        }
+    }
+
+
+    private void handleAddMovie() {
+        MovieDetailGUI detailGUI = new MovieDetailGUI(null, movieManager);
+        detailGUI.setVisible(true);
+
+        // Check if user confirmed the addition
+        if (detailGUI.isConfirmed()) {
+            // Create the appropriate movie object based on category
+            String category = detailGUI.getSelectedCategory();
+            String movieId = detailGUI.getMovieId();
+            String title = detailGUI.getMovieTitle();
+            String director = detailGUI.getMovieDirector();
+            int duration = detailGUI.getDuration();
+            double price = detailGUI.getPrice();
+            String showTime = detailGUI.getShowTime();
+            String extraAttribute = detailGUI.getExtraAttribute();
+            int availableTickets = detailGUI.getAvailableTickets();
+
+            Movie newMovie;
+            switch (category) {
+                case "Action":
+                    newMovie = new ActionMovie(category, movieId, title, director,
+                            duration, price, showTime, extraAttribute, availableTickets);
+                    break;
+                case "Comedy":
+                    newMovie = new ComedyMovie(category, movieId, title, director,
+                            duration, price, showTime, availableTickets);
+                    break;
+                case "Romance":
+                    newMovie = new RomanceMovie(category, movieId, title, director,
+                            duration, price, showTime, extraAttribute, availableTickets);
+                    break;
+                case "ScienceFiction":
+                    newMovie = new ScienceFictionMovie(category, movieId, title, director,
+                            duration, price, showTime, extraAttribute, availableTickets);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(this,
+                            "Invalid category selected!",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+            }
+
+            // Add movie to manager
+            movieManager.addMovie(newMovie);
+
+            // Refresh the table
+            handleSearch();
+
+            // Show success message
+            JOptionPane.showMessageDialog(this,
+                    "Movie '" + title + "' added successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

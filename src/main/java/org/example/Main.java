@@ -22,11 +22,8 @@ public class Main {
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
-            Movie movie = manager.findById("A006");
-            MovieDetailGUI movieDetailGUI = new MovieDetailGUI(movie);
-            MovieDetailGUI movieDetailGUI2 = new MovieDetailGUI(null);
-            movieDetailGUI.setVisible(true);
-            movieDetailGUI2.setVisible(true);
+            MovieTableGUI movieTableGUI = new MovieTableGUI(manager);
+            movieTableGUI.setVisible(true);
         });
     }
 }

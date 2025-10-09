@@ -2,6 +2,7 @@
 package org.example.ui;
 
 import org.example.model.Movie;
+import org.example.service.MovieManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,6 +10,7 @@ import java.awt.*;
 public class MovieDetailGUI extends JDialog {
 
     private Movie movie;
+    private MovieManager movieManager;
 
     private JTextField movieIdField;
     private JTextField titleField;
@@ -37,8 +39,9 @@ public class MovieDetailGUI extends JDialog {
 
     private boolean confirmed = false;
 
-    public MovieDetailGUI(Movie movie) {
+    public MovieDetailGUI(Movie movie, MovieManager movieManager) {
         this.movie = movie;
+        this.movieManager = movieManager;
 
         setTitle("Movie Details");
         setModal(true);
@@ -354,6 +357,18 @@ public class MovieDetailGUI extends JDialog {
                     "Validation Error",
                     JOptionPane.ERROR_MESSAGE);
             return false;
+        }
+
+        // Check for duplicate movie ID when adding a new movie
+        if (movie == null && movieManager != null) {
+            String movieId = movieIdField.getText().trim();
+            if (movieManager.findById(movieId) != null) {
+                JOptionPane.showMessageDialog(this,
+                        "A movie with ID '" + movieId + "' already exists!",
+                        "Duplicate Movie ID",
+                        JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
         }
 
         return true;
